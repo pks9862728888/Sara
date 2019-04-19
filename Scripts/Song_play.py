@@ -1,7 +1,15 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+Created on Thr April 18 18:18:20 2018
+
+@author: Pran Kumar Sarkar
+"""
+
 import os
 import sys
 import pygame
+import speech_recognition as sr
 from threading import Thread
 
 # Defining global variables
@@ -28,6 +36,33 @@ class Music:
         self.height = height
         self.background_colour = (17, 0, 79)
         self.running = False
+
+    def get_song(self):
+        """
+        Gets the name of song from user.
+        :return:
+        """
+        recognizer = sr.Recognizer()
+
+        with sr.Microphone() as source:
+            print("Name the song you want to play")
+
+            try:
+                audio = recognizer.listen(source, timeout=5.0)
+                print("Here")
+
+                song = recognizer.recognize_google(audio)
+            except sr.WaitTimeoutError as e:
+                print(e)
+                song = -1
+            except sr.UnknownValueError:
+                print("Could not understand audio")
+                song = -1
+            except sr.RequestError as e:
+                print("Could not request results: {0}".format(e))
+                song = -1
+
+            return song
 
     def play_music(self, file, file_path):
         """
@@ -68,6 +103,10 @@ class Music:
 
 def main():
     music = Music()
+
+    # Getting name of song
+    song_name = music.get_song()
+    print(song_name)
 
     # Playing favourite song in a thread
     play_music_thread = Thread(target=music.play_music, args=("Theres_no_limit.wav", FAV_SONGS_DIR))
