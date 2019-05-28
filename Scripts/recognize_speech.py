@@ -18,7 +18,7 @@ except Exception:
 
 class RecognizeSpeech:
 
-    def __init__(self):
+    def __init__(self, dynamic_energy_threshold=False, pause_threshold=1):
         """
         Initializes the various threshold for speech recognition.
         """
@@ -26,10 +26,10 @@ class RecognizeSpeech:
         self.recognizer = sr.Recognizer()
 
         # Determines the number of seconds of silence to consider as end of speech
-        self.recognizer.pause_threshold = 1
+        self.recognizer.pause_threshold = pause_threshold
 
         # For taking care of ambient noise in the background
-        self.recognizer.dynamic_energy_threshold = True
+        self.recognizer.dynamic_energy_threshold = dynamic_energy_threshold
 
 
     def recognize_speech(self):
@@ -50,12 +50,14 @@ class RecognizeSpeech:
                     self.speech = self.recognizer.recognize_google(recorded_audio, language="en-in")
                 except sr.UnknownValueError:
                     print("Google Speech Recognition could not understand audio.")
-                    print("Please speak again.")
+                    print("Please speak again.\n")
                 except sr.RequestError as e:
-                    print("Could not request results from Google Speech Recognition service; {0}".format(e))
+                    print(f"Could not request results from Google Speech Recognition service; {e}")
 
         except AttributeError:
-            print("Could not access Microphone.\nInstall PyAudio 0.2.11 or later.")
+            print("Could not find PyAudio 0.2.11 or later. Check installation.")
+            print("Exiting...")
+            exit(-1)
         except Exception:
             print("Could not access Microphone.")
 
@@ -63,7 +65,6 @@ class RecognizeSpeech:
 
 
 if __name__ == "__main__":
-
     speech_object = RecognizeSpeech()
     speech = speech_object.recognize_speech()
     print(speech)
